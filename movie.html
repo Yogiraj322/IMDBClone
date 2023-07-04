@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Movie Page</title>
+</head>
+<body>
+  <header>
+    <h1>Movie Page</h1>
+  </header>
+
+  <div id="movieDetails" class="results-container"></div>
+
+  <script src="script.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+const imdbID = urlParams.get('id');
+
+if (imdbID) {
+  getMovieDetails(imdbID);
+}
+
+function getMovieDetails(imdbID) {
+  const apiKey = '93cc1c40'
+  const url = `https://www.omdbapi.com/?i=${imdbID}&apikey=${apiKey}`;
+
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      if (data.Response === 'True') {
+        displayMovieDetails(data);
+      } else {
+        displayErrorMessage();
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      displayErrorMessage();
+    });
+}
+
+function displayMovieDetails(movie) {
+  const movieDetailsContainer = document.getElementById('movieDetails');
+  movieDetailsContainer.innerHTML = '';
+
+  const { Title, Year, Poster, Plot } = movie;
+
+  const movieItem = document.createElement('div');
+  movieItem.classList.add('movie-item');
+
+  const posterImg = document.createElement('img');
+  posterImg.src = Poster !== 'N/A' ? Poster : 'placeholder.png';
+  posterImg.alt = Title;
+  movieItem.appendChild(posterImg);
+
+  const movieDetails = document.createElement('div');
+  const titleElement = document.createElement('h2');
+  titleElement.classList.add('movie-item-title');
+  titleElement.textContent = Title;
+  const yearElement = document.createElement('p');
+  yearElement.textContent = Year;
+  const plotElement = document.createElement('p');
+  plotElement.textContent = Plot;
+  movieDetails.appendChild(titleElement);
+  movieDetails.appendChild(yearElement);
+  movieDetails.appendChild(plotElement);
+  movieItem.appendChild(movieDetails);
+
+  movieDetailsContainer.appendChild(movieItem);
+}
+
+function displayErrorMessage() {
+  const movieDetailsContainer = document.getElementById('movieDetails');
+  movieDetailsContainer.innerHTML = '<p>Failed to load movie details.</p>';
+}
+
+  </script>
+</body>
+</html>
